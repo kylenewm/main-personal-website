@@ -1,0 +1,65 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+
+# Production
+/build
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env*.local
+.env
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE
+.idea/
+.vscode/
+
+# Local npm cache
+.npm-cache/
+
+# Contact data (contains visitor info)
+/data/
+
+# Transcripts and local audio (personal data)
+/transcripts/
+/data/processed/
+
+# Audio files (interview recordings, personal data)
+*.m4a
+*.mp3
+*.wav
+*.aac
+*.flac
+*.ogg
+
+# Cursor plans (internal planning docs)
+/.cursor/plans/
+
+# Evaluation docs (internal planning)
+/docs/evaluation/metrics.md
+/docs/evaluation/offline-simulation.md
+

@@ -1,0 +1,273 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --text-primary: #ffffff;
+  --text-secondary: #8a8a9a;
+  --accent: #00f0ff;
+  --accent-purple: #7b61ff;
+  --accent-pink: #ff6b9d;
+  --glow: rgba(0, 240, 255, 0.15);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-outfit), system-ui, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #12121a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+/* Typing cursor animation */
+.typing-cursor::after {
+  content: "|";
+  animation: blink 1s step-end infinite;
+  color: var(--accent);
+  font-weight: 300;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Glassmorphism */
+.glass {
+  background: rgba(18, 18, 26, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Glow effects */
+.glow-cyan {
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+}
+
+.glow-purple {
+  box-shadow: 0 0 30px rgba(123, 97, 255, 0.3);
+}
+
+/* Timeline connector */
+.timeline-line {
+  background: linear-gradient(
+    to bottom,
+    var(--accent),
+    var(--accent-purple),
+    transparent
+  );
+}
+
+.timeline-dot {
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
+}
+
+/* Highlight text effect */
+.highlight-text {
+  position: relative;
+  display: inline-block;
+}
+
+.highlight-text::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  width: 100%;
+  height: 12px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-purple));
+  opacity: 0.3;
+  z-index: -1;
+  transform: skewX(-5deg);
+}
+
+/* Neural background grid overlay */
+.grid-overlay {
+  background-image: 
+    linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Light beam sweep */
+.light-beam::before {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 240, 255, 0.03) 30%,
+    rgba(0, 240, 255, 0.08) 50%,
+    rgba(0, 240, 255, 0.03) 70%,
+    transparent 100%
+  );
+  animation: beamSweep 2s ease-out forwards;
+}
+
+@keyframes beamSweep {
+  0% { top: -100%; }
+  100% { top: 100%; }
+}
+
+/* Morph blob */
+.morph-blob {
+  background: radial-gradient(ellipse at center, 
+    rgba(123, 97, 255, 0.3) 0%, 
+    rgba(0, 240, 255, 0.1) 40%, 
+    transparent 70%);
+  filter: blur(60px);
+  animation: morphBlob 20s ease-in-out infinite;
+}
+
+@keyframes morphBlob {
+  0%, 100% { 
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    transform: translateY(-50%) rotate(0deg) scale(1);
+  }
+  25% { 
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    transform: translateY(-50%) rotate(90deg) scale(1.1);
+  }
+  50% { 
+    border-radius: 50% 60% 30% 60% / 30% 40% 70% 50%;
+    transform: translateY(-50%) rotate(180deg) scale(0.95);
+  }
+  75% { 
+    border-radius: 60% 40% 60% 30% / 70% 50% 40% 60%;
+    transform: translateY(-50%) rotate(270deg) scale(1.05);
+  }
+}
+
+/* Pulse animation for logo dot */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+/* Float animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Orb pulse animation */
+@keyframes orbPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+/* Ring expand animation */
+@keyframes ringExpand {
+  0% {
+    width: 200px;
+    height: 200px;
+    opacity: 0.6;
+  }
+  100% {
+    width: 400px;
+    height: 400px;
+    opacity: 0;
+  }
+}
+
+/* Waveform animations */
+@keyframes waveformIdle {
+  0%, 100% { height: 8px; opacity: 0.3; }
+  50% { height: 12px; opacity: 0.5; }
+}
+
+@keyframes waveformActive {
+  0%, 100% { height: 8px; }
+  50% { height: 40px; }
+}
+
+/* Section styling */
+.section-title {
+  font-family: var(--font-space-mono), monospace;
+  font-size: 0.85rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  border-color: rgba(0, 240, 255, 0.2);
+  transform: translateX(8px);
+}
+
+/* Button fill effect */
+.btn-fill {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-fill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--accent);
+  transition: left 0.3s ease;
+  z-index: -1;
+}
+
+.btn-fill:hover::before {
+  left: 0;
+}
+
+.btn-fill:hover {
+  color: var(--bg-primary);
+}
+
+/* Underline animation for nav links */
+.nav-underline {
+  position: relative;
+}
+
+.nav-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.nav-underline:hover::after {
+  width: 100%;
+}
