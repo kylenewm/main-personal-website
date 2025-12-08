@@ -36,7 +36,7 @@ export class VoiceClient {
   private isConnected = false;
   private pendingFunctionCalls: Map<string, FunctionCallEvent> = new Map();
   private inactivityTimer: NodeJS.Timeout | null = null;
-  private readonly INACTIVITY_TIMEOUT = 60 * 1000; // 1 minute
+  private readonly INACTIVITY_TIMEOUT = 30 * 1000; // 30 seconds
 
   constructor(config: VoiceClientConfig) {
     this.config = config;
@@ -47,7 +47,7 @@ export class VoiceClient {
       clearTimeout(this.inactivityTimer);
     }
     this.inactivityTimer = setTimeout(() => {
-      console.log("Disconnecting due to inactivity (1 minute of silence)");
+      console.log("Disconnecting due to inactivity (30 seconds of silence)");
       this.disconnect();
     }, this.INACTIVITY_TIMEOUT);
   }
