@@ -14,10 +14,12 @@ interface ContactSubmission {
   source: "voice_assistant" | "form";
 }
 
-// Store contacts in a JSON file (in production, use a database)
+// Store contacts locally in dev; skip file writes on Vercel (read-only FS)
 const CONTACTS_FILE = path.join(process.cwd(), "data", "contacts.json");
+const isProdReadonly = !!process.env.VERCEL;
 
 function ensureDataDirectory() {
+  if (isProdReadonly) return;
   const dataDir = path.join(process.cwd(), "data");
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
@@ -25,6 +27,7 @@ function ensureDataDirectory() {
 }
 
 function loadContacts(): ContactSubmission[] {
+  if (isProdReadonly) return [];
   try {
     ensureDataDirectory();
     if (fs.existsSync(CONTACTS_FILE)) {
@@ -38,6 +41,7 @@ function loadContacts(): ContactSubmission[] {
 }
 
 function saveContacts(contacts: ContactSubmission[]) {
+  if (isProdReadonly) return;
   ensureDataDirectory();
   fs.writeFileSync(CONTACTS_FILE, JSON.stringify(contacts, null, 2));
 }
@@ -173,9 +177,18 @@ export async function POST(request: NextRequest) {
       source,
     };
 
-    // Save to file
-    contacts.push(contact);
-    saveContacts(contacts);
+    // Save locally only in dev; skip in Vercel (read-only FS)
+    if (!isProdReadonly) {
+      try {
+        contacts.push(contact);
+        saveContacts(contacts);
+        console.log("Contact saved to file");
+      } catch (fsError) {
+        console.warn("Could not save contact to file:", fsError);
+      }
+    } else {
+      console.log("Skipping file save on Vercel (read-only FS)");
+    }
 
     // Send email notification
     await sendEmailNotification(contact);
