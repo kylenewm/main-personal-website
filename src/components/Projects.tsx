@@ -7,7 +7,7 @@ import { useState } from "react";
 interface Project {
   id: string;
   title: string;
-  status: "Live" | "In Progress" | "In Review";
+  status: "In Production" | "In Progress" | "In Review" | "Offline Only" | "Demo Ready";
   description: string;
   features: string[];
   githubUrl?: string;
@@ -18,7 +18,7 @@ const projects: Project[] = [
   {
     id: "ai-briefing",
     title: "AI Morning Briefing",
-    status: "In Progress",
+    status: "In Production",
     description:
       "An automated daily briefing system that delivers personalized AI insights every weekday at 9:30 AM ET. Intelligently curates AI articles, summarizes podcasts, and processes newsletters into a single, digestible morning update.",
     features: [
@@ -33,7 +33,7 @@ const projects: Project[] = [
   {
     id: "slack-intelligence",
     title: "Slack Intelligence",
-    status: "In Progress",
+    status: "Demo Ready",
     description:
       "An AI-powered workflow automation system that transforms Slack message overload into actionable insights. Processes 100+ daily messages to prioritize, categorize, and create tasks automatically.",
     features: [
