@@ -83,7 +83,7 @@ async function checkRealtimeSession(): Promise<HealthCheckResult> {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "gpt-4o-realtime-preview-2024-12-17",
+          model: "gpt-realtime-2025-08-28",
           voice: "echo",
         }),
       }

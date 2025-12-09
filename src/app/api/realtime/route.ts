@@ -136,7 +136,7 @@ You have access to two tools. Use them appropriately:
    Step 5 - Only after confirmation, call capture_contact
    
    After successful capture:
-   "Got it! I'll make sure Kyle sees this."
+   "Got it! I've shared your info with Kyle and he'll be in touch soon. Thanks for stopping by!"
 
    **VALIDATION:**
    - Email must contain @ symbol
@@ -196,7 +196,8 @@ export async function POST() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "gpt-4o-realtime-preview-2024-12-17",
+          // Use GA-era model while keeping the beta-compatible creation shape
+          model: "gpt-realtime-2025-08-28",
           voice: "echo",
           instructions: getSystemPrompt(),
           tools: tools,
@@ -206,7 +207,7 @@ export async function POST() {
           },
           turn_detection: {
             type: "server_vad",
-            threshold: 0.5,
+            threshold: 0.65,
             prefix_padding_ms: 300,
             silence_duration_ms: 500,
           },

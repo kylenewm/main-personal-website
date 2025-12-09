@@ -36,7 +36,8 @@ export class VoiceClient {
   private isConnected = false;
   private pendingFunctionCalls: Map<string, FunctionCallEvent> = new Map();
   private inactivityTimer: NodeJS.Timeout | null = null;
-  private readonly INACTIVITY_TIMEOUT = 30 * 1000; // 30 seconds
+  private contactDisconnectTimer: NodeJS.Timeout | null = null;
+  private readonly INACTIVITY_TIMEOUT = 60 * 1000; // 60 seconds
 
   constructor(config: VoiceClientConfig) {
     this.config = config;
@@ -47,7 +48,7 @@ export class VoiceClient {
       clearTimeout(this.inactivityTimer);
     }
     this.inactivityTimer = setTimeout(() => {
-      console.log("Disconnecting due to inactivity (30 seconds of silence)");
+      console.log("Disconnecting due to inactivity (60 seconds of silence)");
       this.disconnect();
     }, this.INACTIVITY_TIMEOUT);
   }
@@ -137,7 +138,7 @@ export class VoiceClient {
       // Send offer to OpenAI
       console.log("[VoiceClient] Step 8: Sending SDP offer to OpenAI");
       const sdpResponse = await fetch(
-        "https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17",
+        "https://api.openai.com/v1/realtime?model=gpt-realtime-2025-08-28",
         {
           method: "POST",
           headers: {
@@ -219,6 +220,12 @@ export class VoiceClient {
     switch (type) {
       case "input_audio_buffer.speech_started":
         this.resetInactivityTimer(); // User started speaking
+        // Cancel post-contact disconnect if user keeps talking
+        if (this.contactDisconnectTimer) {
+          console.log("[VoiceClient] User spoke, cancelling post-contact disconnect");
+          clearTimeout(this.contactDisconnectTimer);
+          this.contactDisconnectTimer = null;
+        }
         this.config.onStatusChange("listening");
         break;
 
@@ -314,6 +321,15 @@ export class VoiceClient {
 
         case "capture_contact":
           result = await this.callContactAPI(args);
+          // Auto-disconnect after contact capture (give AI time to confirm first)
+          // Timer is cancelled if user speaks again
+          if ((result as { success?: boolean })?.success) {
+            console.log("[VoiceClient] Contact captured, will disconnect in 10s unless user speaks");
+            this.contactDisconnectTimer = setTimeout(() => {
+              console.log("[VoiceClient] Auto-disconnecting after contact capture");
+              this.disconnect();
+            }, 10000); // 10 seconds for AI to say confirmation
+          }
           break;
 
         // book_meeting disabled - saved in src/lib/future-tools.ts
@@ -410,6 +426,12 @@ export class VoiceClient {
       console.log("[VoiceClient] Clearing inactivity timer");
       clearTimeout(this.inactivityTimer);
       this.inactivityTimer = null;
+    }
+
+    // Clear contact disconnect timer
+    if (this.contactDisconnectTimer) {
+      clearTimeout(this.contactDisconnectTimer);
+      this.contactDisconnectTimer = null;
     }
 
     if (this.localStream) {

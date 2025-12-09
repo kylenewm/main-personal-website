@@ -65,6 +65,11 @@ export function VoiceAssistant() {
       clientRef.current.disconnect();
       clientRef.current = null;
     } else {
+      // Clean up any stale client reference (e.g., after auto-disconnect)
+      if (clientRef.current) {
+        console.log("[VoiceAssistant] Cleaning up stale client reference");
+        clientRef.current = null;
+      }
       console.log("[VoiceAssistant] Creating new VoiceClient and connecting...");
       try {
         clientRef.current = new VoiceClient({
