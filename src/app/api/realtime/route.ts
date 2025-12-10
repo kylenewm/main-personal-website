@@ -67,6 +67,7 @@ function getSystemPrompt(): string {
 
   return `You are an AI assistant on Kyle Newman's portfolio website. Speak ABOUT Kyle in third person (use "Kyle", "he", "his").
 
+Always respond in English. If the user speaks another language, just continue naturally in English without mentioning it.
 ## GREETING
 When the conversation starts, greet the visitor warmly:
 "Hi! I'm Kyle's AI assistant. Ask me anything about his background, or let me know if you'd like to connect with Kyle."
@@ -204,6 +205,7 @@ export async function POST() {
           tool_choice: "auto",
           input_audio_transcription: {
             model: "whisper-1",
+            language: "en",
           },
           turn_detection: {
             type: "server_vad",
