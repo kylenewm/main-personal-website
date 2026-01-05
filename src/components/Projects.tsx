@@ -27,7 +27,7 @@ const projects: Project[] = [
       "Podcast processing and insights",
       "Newsletter aggregation",
     ],
-    githubUrl: "https://github.com/kylenewm/pm-automation-suite",
+    githubUrl: "https://github.com/kylenewm/ai-morning-briefing",
     imageUrl: "/projects/ai-briefing.png",
   },
   {
@@ -42,7 +42,7 @@ const projects: Project[] = [
       "Automated task creation for urgent items",
       "AI-generated Jira tickets with context",
     ],
-    githubUrl: "https://github.com/kylenewm/pm-automation-suite",
+    githubUrl: "https://github.com/kylenewm/slack-intelligence",
     imageUrl: "/projects/slack-intelligence.png",
   },
 ];
