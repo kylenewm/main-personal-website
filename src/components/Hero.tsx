@@ -92,10 +92,9 @@ export function Hero() {
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
             className="text-lg leading-relaxed text-text-secondary mb-10 max-w-xl"
           >
-            Currently building conversational AI at scale at{" "}
-            <strong className="text-white">Red Ventures</strong>. 
-            I&apos;m passionate about using ML and AI to automate and optimize existing processes, 
-            with exposure to recommender systems, NLP, and related domains.
+            I build and ship ML/AI systems that power key products and workflows. At{" "}
+            <strong className="text-white">Red Ventures</strong>, I&apos;m focused on
+            improving and scaling an AI sales agent that supports millions of inbound calls.
           </motion.p>
 
           {/* Social Icons */}

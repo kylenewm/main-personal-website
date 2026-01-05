@@ -18,7 +18,7 @@ export const timelineData: TimelineEntry[] = [
     organizationUrl: "https://redventures.com",
     date: "July 2025 - Present",
     description:
-      "Leading product strategy for conversational AI at scale, including roadmap ownership, R&D initiatives for next-generation voice AI, and driving platform scalability improvements.",
+      "Led the core conversational platform for a virtual sales agent, owning the roadmap, driving scalability improvements, and supporting implementation across new businesses for millions of sales calls. Currently leading R&D efforts to overhaul the architecture to enable end-to-end AI-driven sales calls, from lead qualification through close.",
     type: "work",
   },
   {
@@ -29,7 +29,7 @@ export const timelineData: TimelineEntry[] = [
     organizationUrl: "https://redventures.com",
     date: "July 2024 - June 2025",
     description:
-      "Optimized AI agents through prompt engineering and model orchestration, while improving quality and implementation of third-party integrations across the platform.",
+      "Optimized AI agents through prompt engineering, dialogue design, and model orchestration, materially improving conversion performance while strengthening third-party integrations across the platform.",
     type: "work",
   },
   {
@@ -40,7 +40,7 @@ export const timelineData: TimelineEntry[] = [
     organizationUrl: "https://cnet.com",
     date: "May 2023 - July 2024",
     description:
-      "Owned data strategy for CNET's site-wide redesign, driving KPI alignment across user engagement and revenue. Built data pipelines and dashboards while spearheading ML personalization initiatives.",
+      "Contributed to analytics and data science work at CNET, supporting data strategy, KPI definition, and reporting across major initiatives. Built data pipelines and dashboards, and partnered with product and engineering to support ML-driven personalization efforts.",
     type: "work",
   },
   {
