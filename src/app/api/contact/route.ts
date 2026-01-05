@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import nodemailer from "nodemailer";
+import { logger } from "@/lib/logger";
 
 interface ContactSubmission {
   name: string;
@@ -94,9 +95,9 @@ Source: ${contact.source}
         `.trim(),
       });
 
-      console.log("Email notification sent successfully");
+      logger.contact.emailSent();
     } catch (error) {
-      console.error("Failed to send email:", error);
+      logger.contact.emailFailed(error instanceof Error ? error.message : "Unknown error");
       // Don't fail the request if email fails
     }
   }
@@ -177,17 +178,16 @@ export async function POST(request: NextRequest) {
       source,
     };
 
+    logger.contact.submitted(!!email, !!phone);
+
     // Save locally only in dev; skip in Vercel (read-only FS)
     if (!isProdReadonly) {
       try {
         contacts.push(contact);
         saveContacts(contacts);
-        console.log("Contact saved to file");
-      } catch (fsError) {
-        console.warn("Could not save contact to file:", fsError);
+      } catch {
+        // File save is optional, don't log every time
       }
-    } else {
-      console.log("Skipping file save on Vercel (read-only FS)");
     }
 
     // Send email notification
@@ -198,7 +198,10 @@ export async function POST(request: NextRequest) {
       message: "Contact information captured successfully.",
     });
   } catch (error) {
-    console.error("Contact capture error:", error);
+    logger.error("Contact capture failed", {
+      component: "contact",
+      error: error instanceof Error ? error.message : "Unknown error"
+    });
     return NextResponse.json(
       { error: "Failed to capture contact information" },
       { status: 500 }

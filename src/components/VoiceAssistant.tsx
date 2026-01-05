@@ -154,7 +154,7 @@ export function VoiceAssistant() {
           className="text-center"
         >
           {/* Voice Orb */}
-          <div className="relative w-[200px] h-[200px] mx-auto mb-10">
+          <div className="relative w-[140px] h-[140px] md:w-[200px] md:h-[200px] mx-auto mb-10">
             {/* Orb Button */}
             <button
               onClick={toggleConnection}
@@ -176,7 +176,7 @@ export function VoiceAssistant() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className={`w-12 h-12 transition-colors duration-300 ${
+                className={`w-10 h-10 md:w-12 md:h-12 transition-colors duration-300 ${
                   isActive ? "text-white" : "text-accent"
                 }`}
               >

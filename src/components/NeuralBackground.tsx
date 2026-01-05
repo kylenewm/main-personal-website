@@ -16,6 +16,7 @@ export function NeuralBackground() {
   const nodesRef = useRef<Node[]>([]);
   const mouseRef = useRef<{ x: number | null; y: number | null }>({ x: null, y: null });
   const animationRef = useRef<number>();
+  const isMobileRef = useRef(false);
   const [showBeam, setShowBeam] = useState(true);
   const [canvasReady, setCanvasReady] = useState(false);
 
@@ -40,12 +41,14 @@ export function NeuralBackground() {
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      isMobileRef.current = window.innerWidth < 768;
       initNodes();
     };
 
     const initNodes = () => {
-      // Reduced node count for better performance (was 15000)
-      const nodeCount = Math.floor((canvas.width * canvas.height) / 20000);
+      // Reduce nodes on mobile for better performance
+      const divisor = isMobileRef.current ? 40000 : 20000;
+      const nodeCount = Math.floor((canvas.width * canvas.height) / divisor);
       nodesRef.current = [];
 
       for (let i = 0; i < nodeCount; i++) {
@@ -94,26 +97,30 @@ export function NeuralBackground() {
         ctx.fill();
       });
 
-      // Draw connections between nodes
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
-          const dx = nodes[i].x - nodes[j].x;
-          const dy = nodes[i].y - nodes[j].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+      // Draw connections between nodes (skip on mobile for performance)
+      if (!isMobileRef.current) {
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            const dx = nodes[i].x - nodes[j].x;
+            const dy = nodes[i].y - nodes[j].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
 
-          if (distance < connectionDistance) {
-            const alpha = (1 - distance / connectionDistance) * 0.15;
-            ctx.beginPath();
-            ctx.moveTo(nodes[i].x, nodes[i].y);
-            ctx.lineTo(nodes[j].x, nodes[j].y);
-            ctx.strokeStyle = `rgba(0, 240, 255, ${alpha})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
+            if (distance < connectionDistance) {
+              const alpha = (1 - distance / connectionDistance) * 0.15;
+              ctx.beginPath();
+              ctx.moveTo(nodes[i].x, nodes[i].y);
+              ctx.lineTo(nodes[j].x, nodes[j].y);
+              ctx.strokeStyle = `rgba(0, 240, 255, ${alpha})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
           }
         }
+      }
 
-        // Draw connections to mouse
-        if (mouse.x !== null && mouse.y !== null) {
+      // Draw connections to mouse (desktop only)
+      if (!isMobileRef.current && mouse.x !== null && mouse.y !== null) {
+        for (let i = 0; i < nodes.length; i++) {
           const dx = nodes[i].x - mouse.x;
           const dy = nodes[i].y - mouse.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
@@ -162,8 +169,8 @@ export function NeuralBackground() {
         style={{ background: "#0a0a0f" }}
       />
 
-      {/* Morphing Gradient Blob */}
-      <div className="fixed w-[800px] h-[800px] top-1/2 right-[-200px] -translate-y-1/2 morph-blob z-[1] pointer-events-none" />
+      {/* Morphing Gradient Blob - hidden on mobile for performance */}
+      <div className="fixed w-[800px] h-[800px] top-1/2 right-[-200px] -translate-y-1/2 morph-blob z-[1] pointer-events-none hidden md:block" />
 
       {/* Grid Overlay */}
       <div className="fixed inset-0 grid-overlay z-[1] pointer-events-none" />

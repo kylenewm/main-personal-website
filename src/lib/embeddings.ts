@@ -2,10 +2,13 @@
 // Simple in-memory implementation - can upgrade to Pinecone/Weaviate later
 
 import { KnowledgeChunk, getAllChunks } from "./knowledge-segments";
+import { logger } from "./logger";
 
 // Cache for embeddings (generated on first search)
 let embeddingsCache: Map<string, number[]> | null = null;
-let isGeneratingEmbeddings = false;
+let embeddingsPromise: Promise<void> | null = null; // Promise-based locking to prevent deadlocks
+let cacheTimestamp: number | null = null;
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour TTL
 
 // Cosine similarity between two vectors
 function cosineSimilarity(a: number[], b: number[]): number {
@@ -44,24 +47,49 @@ async function generateEmbedding(text: string, apiKey: string): Promise<number[]
   return data.data[0].embedding;
 }
 
-// Initialize embeddings cache for all knowledge chunks
-async function initializeEmbeddings(apiKey: string): Promise<void> {
-  if (embeddingsCache || isGeneratingEmbeddings) return;
-  
-  isGeneratingEmbeddings = true;
-  embeddingsCache = new Map();
-  
+// Check if cache is stale
+function isCacheStale(): boolean {
+  if (!cacheTimestamp) return true;
+  return Date.now() - cacheTimestamp > CACHE_TTL_MS;
+}
+
+// Generate embeddings for all chunks (internal implementation)
+async function generateAllEmbeddings(apiKey: string): Promise<void> {
+  const newCache = new Map<string, number[]>();
   const allChunks = getAllChunks();
-  console.log("Generating embeddings for knowledge base...");
-  
+
   for (const chunk of allChunks) {
     const textToEmbed = `${chunk.subcategory}: ${chunk.content}`;
     const embedding = await generateEmbedding(textToEmbed, apiKey);
-    embeddingsCache.set(chunk.id, embedding);
+    newCache.set(chunk.id, embedding);
   }
-  
-  console.log(`Generated embeddings for ${allChunks.length} chunks`);
-  isGeneratingEmbeddings = false;
+
+  embeddingsCache = newCache;
+  cacheTimestamp = Date.now();
+  logger.search.embeddingsGenerated(allChunks.length);
+}
+
+// Initialize embeddings cache for all knowledge chunks
+// Uses Promise-based locking to prevent race conditions
+async function initializeEmbeddings(apiKey: string): Promise<void> {
+  // If cache exists and is not stale, we're done
+  if (embeddingsCache && !isCacheStale()) {
+    return;
+  }
+
+  // If generation is in progress, wait for it
+  if (embeddingsPromise) {
+    return embeddingsPromise;
+  }
+
+  // Start generating and store the promise so others can wait
+  embeddingsPromise = generateAllEmbeddings(apiKey);
+
+  try {
+    await embeddingsPromise;
+  } finally {
+    embeddingsPromise = null; // Reset so future calls can regenerate if needed
+  }
 }
 
 // Search interface

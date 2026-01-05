@@ -1,3 +1,5 @@
+import { logger, generateSessionId } from "./logger";
+
 export interface VoiceClientConfig {
   onStatusChange: (status: VoiceStatus) => void;
   onTranscript: (transcript: TranscriptEntry) => void;
@@ -34,6 +36,7 @@ export class VoiceClient {
   private localStream: MediaStream | null = null;
   private config: VoiceClientConfig;
   private isConnected = false;
+  private isConnecting = false; // Prevent race conditions from rapid clicks
   private pendingFunctionCalls: Map<string, FunctionCallEvent> = new Map();
   private inactivityTimer: NodeJS.Timeout | null = null;
   private contactDisconnectTimer: NodeJS.Timeout | null = null;
@@ -54,7 +57,15 @@ export class VoiceClient {
   }
 
   async connect(): Promise<void> {
-    console.log("[VoiceClient] 🎤 connect() called");
+    // Prevent race conditions from rapid clicks
+    if (this.isConnecting) {
+      console.log("[VoiceClient] ⚠️ Already connecting, ignoring duplicate call");
+      return;
+    }
+
+    generateSessionId(); // Create session ID for tracing
+    logger.voice.connecting();
+    this.isConnecting = true;
     this.config.onStatusChange("connecting");
 
     try {
@@ -81,8 +92,19 @@ export class VoiceClient {
       // Add connection state listeners
       this.pc.onconnectionstatechange = () => {
         console.log("[VoiceClient] 🔌 PeerConnection state:", this.pc?.connectionState);
-        if (this.pc?.connectionState === "failed" || this.pc?.connectionState === "disconnected") {
-          console.error("[VoiceClient] ❌ PeerConnection failed/disconnected");
+        if (this.pc?.connectionState === "failed") {
+          console.error("[VoiceClient] ❌ PeerConnection failed");
+          this.config.onError("Connection failed. Please try again.");
+          this.config.onStatusChange("error");
+          this.disconnect();
+        } else if (this.pc?.connectionState === "disconnected") {
+          console.log("[VoiceClient] ⚠️ PeerConnection disconnected");
+          // Give it a moment to recover before treating as error
+          setTimeout(() => {
+            if (this.pc?.connectionState === "disconnected") {
+              this.config.onStatusChange("idle");
+            }
+          }, 2000);
         }
       };
 
@@ -94,6 +116,9 @@ export class VoiceClient {
       console.log("[VoiceClient] Step 3: Creating audio element");
       this.audioElement = document.createElement("audio");
       this.audioElement.autoplay = true;
+      this.audioElement.playsInline = true;
+      // Append to DOM - some browsers require this for autoplay
+      document.body.appendChild(this.audioElement);
 
       // Handle incoming audio from OpenAI
       this.pc.ontrack = (event) => {
@@ -101,6 +126,13 @@ export class VoiceClient {
         if (this.audioElement && event.streams[0]) {
           this.audioElement.srcObject = event.streams[0];
           console.log("[VoiceClient] ✅ Audio track attached to audio element");
+          // Explicitly play to handle autoplay policy
+          this.audioElement.play().then(() => {
+            console.log("[VoiceClient] ✅ Audio playback started");
+          }).catch((err) => {
+            console.error("[VoiceClient] ❌ Audio play failed:", err);
+            this.config.onError("Audio playback blocked by browser. Please allow audio.");
+          });
           this.config.onStatusChange("connected");
         }
       };
@@ -166,15 +198,15 @@ export class VoiceClient {
       console.log("[VoiceClient] ✅ Remote description set");
 
       this.isConnected = true;
+      this.isConnecting = false;
       this.resetInactivityTimer(); // Start inactivity timer when connected
-      console.log("[VoiceClient] ✅✅✅ Connection successful! isConnected:", this.isConnected);
+      logger.voice.connected();
       this.config.onStatusChange("connected");
     } catch (error) {
-      console.error("[VoiceClient] ❌❌❌ Connection error:", error);
-      console.error("[VoiceClient] Error stack:", error instanceof Error ? error.stack : "No stack");
-      this.config.onError(
-        error instanceof Error ? error.message : "Connection failed"
-      );
+      const errorMessage = error instanceof Error ? error.message : "Connection failed";
+      logger.voice.error(errorMessage);
+      this.isConnecting = false;
+      this.config.onError(errorMessage);
       this.config.onStatusChange("error");
       this.disconnect();
     }
@@ -417,9 +449,9 @@ export class VoiceClient {
   }
 
   disconnect(): void {
-    console.log("[VoiceClient] 🔌 disconnect() called");
-    console.trace("[VoiceClient] Disconnect call stack:");
+    logger.voice.disconnected();
     this.isConnected = false;
+    this.isConnecting = false;
 
     // Clear inactivity timer
     if (this.inactivityTimer) {
@@ -448,13 +480,22 @@ export class VoiceClient {
 
     if (this.pc) {
       console.log("[VoiceClient] Closing peer connection, state:", this.pc.connectionState);
+      // Clear event handlers to prevent memory leaks
+      this.pc.onconnectionstatechange = null;
+      this.pc.oniceconnectionstatechange = null;
+      this.pc.ontrack = null;
       this.pc.close();
       this.pc = null;
     }
 
     if (this.audioElement) {
       console.log("[VoiceClient] Clearing audio element");
+      this.audioElement.pause();
       this.audioElement.srcObject = null;
+      // Remove from DOM
+      if (this.audioElement.parentNode) {
+        this.audioElement.parentNode.removeChild(this.audioElement);
+      }
       this.audioElement = null;
     }
 

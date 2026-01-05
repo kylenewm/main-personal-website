@@ -135,25 +135,6 @@ export function Hero() {
               </div>
             </div>
 
-            {/* Floating Data Points - adjusted spacing for new text */}
-            <div
-              className="absolute top-[12%] -right-32 font-mono text-[0.65rem] text-accent bg-accent/10 border border-accent/20 px-3 py-1.5 rounded whitespace-nowrap hidden md:block"
-              style={{ animation: "float 4s ease-in-out infinite" }}
-            >
-              Agentic AI
-            </div>
-            <div
-              className="absolute top-[45%] -left-44 font-mono text-[0.65rem] text-accent bg-accent/10 border border-accent/20 px-3 py-1.5 rounded whitespace-nowrap hidden md:block"
-              style={{ animation: "float 4s ease-in-out infinite 1s" }}
-            >
-              Conversational AI
-            </div>
-            <div
-              className="absolute bottom-[18%] -right-44 font-mono text-[0.65rem] text-accent bg-accent/10 border border-accent/20 px-3 py-1.5 rounded whitespace-nowrap hidden md:block"
-              style={{ animation: "float 4s ease-in-out infinite 2s" }}
-            >
-              ML Personalization
-            </div>
           </div>
         </motion.div>
       </div>
