@@ -116,7 +116,7 @@ export class VoiceClient {
       console.log("[VoiceClient] Step 3: Creating audio element");
       this.audioElement = document.createElement("audio");
       this.audioElement.autoplay = true;
-      this.audioElement.playsInline = true;
+      this.audioElement.setAttribute("playsinline", "true");
       // Append to DOM - some browsers require this for autoplay
       document.body.appendChild(this.audioElement);
 
