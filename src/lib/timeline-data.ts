@@ -40,7 +40,7 @@ export const timelineData: TimelineEntry[] = [
     organizationUrl: "https://cnet.com",
     date: "May 2023 - July 2024",
     description:
-      "Contributed to analytics and data science work at CNET, supporting data strategy, KPI definition, and reporting across major initiatives. Built data pipelines and dashboards, and partnered with product and engineering to support ML-driven personalization efforts.",
+      "Contributed to analytics and data science work at CNET, supporting data strategy, forecasting, and reporting across major initiatives. Built data pipelines and dashboards, and partnered with product and engineering to support ML-driven personalization efforts.",
     type: "work",
   },
   {
